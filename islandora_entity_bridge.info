@@ -1,8 +1,0 @@
-name = Islandora Entity Bridge
-description = Bridge module to reference Islandora Entities/Fedora Objects
-core = 7.x
-dependencies[] = islandora
-dependencies[] = entity
-files[] = handlers/views_islandora_entity_bridge_handler_field_datastream.inc
-files[] = handlers/views_islandora_entity_bridge_handler_field_datastream_image.inc
-files[] = handlers/views_islandora_entity_bridge_handler_field_datastream_xpath.inc

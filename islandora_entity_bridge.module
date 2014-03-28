@@ -1,0 +1,272 @@
+<?php
+
+/********** CORE HOOKS **********/
+
+/**
+ * Implements hook_entity_info().
+ */
+function islandora_entity_bridge_entity_info() {
+  module_load_include('inc', 'islandora', 'includes/utilities');
+
+  $entities = array();
+  $entities['islandora_entity_bridge'] = array(
+    'label' => t('Islandora Entity Bridge Object'),
+    'label callback' => 'islandora_entity_bridge_label',
+    'entity class' => 'IslandoraEntityBridge',
+    'controller class' => 'IslandoraEntityBridgeController',
+    'base table' => 'islandora_entity_bridge_mapping',
+    'uri callback' => 'islandora_entity_bridge_uri',
+    'static cache' => FALSE,
+    'field cache' => FALSE,
+    'entity cache' => FALSE,
+    'load hook' => 'islandora_entity_bridge_load',
+    'fieldable' => FALSE,
+    'module' => 'islandora_entity_bridge',
+    'access callback' => 'islandora_entity_bridge_access_callback',
+    'entity keys' => array(
+      'id' => 'iebid',
+      'label' => 'label',
+      'bundle' => 'type',
+    ),
+    'bundles' => array(),
+    'view modes' => array(
+      'full' => array(
+        'label' => t('Full content'),
+        'custom settings' => FALSE,
+      ),
+      'teaser' => array(
+        'label' => t('Teaser'),
+        'custom settings' => TRUE,
+      ),
+      'preview' => array(
+        'label' => t('Preview'),
+        'custom settings' => FALSE,
+      ),
+    ),
+  );
+  foreach (islandora_get_content_models(TRUE) as $content_model) {
+    $entities['islandora_entity_bridge']['bundles'][$content_model['pid']] = array(
+      'label' => $content_model['label'],
+    );
+  }
+
+  return $entities;
+}
+
+/**
+ * Implements hook_menu().
+ */
+function islandora_entity_bridge_menu() {
+  $items = array();
+
+  $items['islandora_entity_bridge/%islandora_entity_bridge'] = array(
+    'title' => 'Islandora Entity Bridge Object',
+    'page callback' => 'islandora_entity_bridge_view_entity',
+    'page arguments' => array(1),
+    'access callback' => 'islandora_entity_bridge_access_menu_callback',
+    'access arguments' => array(FEDORA_VIEW_OBJECTS, 1),
+  );
+
+  return $items;
+}
+
+/********** CONTRIB HOOKS **********/
+
+/**
+ * Implements hook_islandora_object_ingested().
+ */
+function islandora_entity_bridge_islandora_object_ingested(AbstractObject $object) {
+  $values = array(
+    'pid' => $object->id,
+    'type' => $object->models[0],
+    'label' => $object->label,
+    'state' => $object->state,
+  );
+  $islandora_entity_bridge_object = entity_create('islandora_entity_bridge', $values);
+  $islandora_entity_bridge_object->save();
+}
+
+/**
+ * Implements hook_islandora_object_modified().
+ */
+function islandora_entity_bridge_islandora_object_modified(AbstractObject $object) {
+  $results = db_select('islandora_entity_bridge_mapping', 'iebm')
+              ->fields('iebm', array('iebid'))
+              ->condition('iebm.pid', $object->id)
+              ->execute();
+  if ($results->rowCount() > 0) {
+    foreach ($results as $result) {
+      $islandora_entity_bridge_object = islandora_entity_bridge_load($result->iebid);
+      $islandora_entity_bridge_object->pid = $object->id;
+      $islandora_entity_bridge_object->type = $object->models[0];
+      $islandora_entity_bridge_object->label = $object->label;
+      $islandora_entity_bridge_object->state = $object->state;
+      $islandora_entity_bridge_object->save();
+    }
+  }
+  else {
+    islandora_entity_bridge_islandora_object_ingested($object);
+  }
+}
+
+/**
+ * Implements islandora_view_object().
+ */
+function islandora_entity_bridge_islandora_view_object(AbstractObject $object) {
+  $results = db_select('islandora_entity_bridge_mapping', 'iebm')
+              ->fields('iebm', array('iebid'))
+              ->condition('iebm.pid', $object->id)
+              ->execute();
+  if ($results->rowCount() > 0) {
+    // Do nothing.
+  }
+  else {
+    islandora_entity_bridge_islandora_object_ingested($object);
+  }
+}
+
+/**
+ * Implements hook_islandora_object_purged().
+ */
+function islandora_entity_bridge_islandora_object_purged(AbstractObject $object) {
+  $results = db_select('islandora_entity_bridge_mapping', 'iebm')
+              ->fields('iebm', array('iebid'))
+              ->condition('iebm.pid', $object->id)
+              ->execute();
+  if ($results->rowCount() > 0) {
+    foreach ($results as $result) {
+      $islandora_entity_bridge_object = islandora_entity_bridge_load($result->iebid);
+      $islandora_entity_bridge_object->delete();
+    }
+  }
+}
+
+/**
+ * Implements hook_views_api().
+ */
+function islandora_entity_bridge_views_api() {
+  return array(
+    'api' => '3',
+  );
+}
+
+/********** ISLANDORA ENTITY BRIDGE OBJECT FUNCTIONS **********/
+
+/**
+ * Check access permission for Islandora Entity Bridge Entity UI.
+ */
+function islandora_entity_bridge_access_menu_callback($op, $islandora_entity_bridge_object = NULL, $account = NULL) {
+  $islandora_object = islandora_object_load($islandora_entity_bridge_object->pid);
+  return islandora_object_access_callback($op, $islandora_object);
+}
+
+/**
+ * Access callback for Islandora Entity Bridge Objects.
+ */
+function islandora_entity_bridge_access_callback() {
+  return user_access(FEDORA_VIEW_OBJECTS);
+}
+
+/**
+ * Autoloader callback for entity object.
+ */
+function islandora_entity_bridge_load($islandora_entity_bridge_object_id, $reset = FALSE) {
+  $islandora_entity_bridge_objects = islandora_entity_bridge_load_multiple(array($islandora_entity_bridge_object_id), array(), $reset);
+  return reset($islandora_entity_bridge_objects);
+}
+
+/**
+ * Loads multiple entity objects.
+ */
+function islandora_entity_bridge_load_multiple($islandora_entity_bridge_object_ids = array(), $conditions = array('in_office' => 1), $reset = FALSE) {
+  return entity_load('islandora_entity_bridge', $islandora_entity_bridge_object_ids, $conditions, $reset);
+}
+
+/**
+ * Deletes an islandora entity bridge object.
+ */
+function islandora_entity_bridge_delete(IslandoraEntityBridge $islandora_entity_bridge_object) {
+  $islandora_entity_bridge_object->delete();
+}
+
+/**
+ * Delete multiple islandora entity bridge objects.
+ */
+function islandora_entity_bridge_delete_multiple(array $islandora_entity_bridge_object_ids) {
+  entity_get_controller('islandora_entity_bridge')->delete($islandora_entity_bridge_object_ids);
+}
+
+/**
+ * Label callback for islandora entity bridge objects, for menu router, etc.
+ */
+function islandora_entity_bridge_label($islandora_entity_bridge_object, $type) {
+  $label = $islandora_entity_bridge_object->label;
+  $context = clone $islandora_entity_bridge_object;
+  drupal_alter('islandora_entity_bridge_object_label', $label, $context);
+  return $label;
+}
+
+/**
+ * URI callback for islandora entity bridge objects.
+ */
+function islandora_entity_bridge_uri($islandora_entity_bridge_object) {
+  return array('path' => 'islandora/object/' . $islandora_entity_bridge_object->pid);
+}
+
+/**
+* View for /islandora_entity_bridge/<$islandora_entity_bridge_object_id> page.
+*/
+function islandora_entity_bridge_view_entity($islandora_entity_bridge_object) {
+  drupal_set_title($islandora_entity_bridge_object->label);
+  return entity_view('islandora_entity_bridge', array($islandora_entity_bridge_object), 'full');
+}
+
+/********** PRIVATE FUNCTIONS **********/
+
+/********** CLASSES **********/
+
+/**
+ * Object Class for Islandora Entity Bridge.
+ * Create any necessary overrides.
+ */
+class IslandoraEntityBridge extends Entity {
+  /**
+   * Override defaultUri().
+   */
+  protected function defaultUri() {
+    return islandora_entity_bridge_uri($this);
+  }
+}
+
+/**
+ * Controller class for Islandora Entity Bridge.
+ *
+ * This extends the DrupalDefaultEntityController class, adding required
+ * special handling for islandora entity bridge objects.
+ */
+class IslandoraEntityBridgeController extends EntityAPIController {
+
+  /**
+   * Overrides attachLoad().
+   */
+  protected function attachLoad(&$entities, $revision_id = FALSE) {
+    // Figure out any other hooks you want to attach.
+    parent::attachLoad($entities, $revision_id);
+    foreach ($entities as $entity) {
+      $entity->islandora_object = islandora_object_load($entity->pid);
+    }
+  }
+
+  /**
+   * Override the save method.
+   */
+  public function save($entity, DatabaseTransaction $transaction = NULL) {
+    $replacements = array(
+      '<',
+      '>',
+      'info:fedora/'
+    );
+    $entity->pid = str_replace($replacements, '', $entity->pid);
+    return parent::save($entity, $transaction);
+  }
+}

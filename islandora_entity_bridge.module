@@ -92,6 +92,56 @@ function islandora_entity_bridge_menu() {
 
 /********** CONTRIB HOOKS **********/
 
+/*
+ * Implements hook_entity_property_info().
+ */
+function islandora_entity_bridge_entity_property_info() {
+  $info = array();
+  // Add meta-data about the basic node properties.
+  $properties = &$info['islandora_entity_bridge']['properties'];
+
+  $properties['iebid'] = array(
+    'label' => t("Islandora Entity Bridge ID"),
+    'type' => 'integer',
+    'description' => t("The Drupal-side ID of the Islandora/Fedora Object."),
+    'schema field' => 'iebid',
+  );
+
+  $properties['pid'] = array(
+    'label' => t("PID"),
+    'description' => t("The Islandora/Fedora object ID."),
+    'setter callback' => 'entity_property_verbatim_set',
+    'schema field' => 'pid',
+    'required' => TRUE,
+  );
+
+  $properties['type'] = array(
+    'label' => t("Type"),
+    'description' => t("The Islandora/Fedora object CModel."),
+    'setter callback' => 'entity_property_verbatim_set',
+    'schema field' => 'type',
+    'required' => TRUE,
+  );
+
+  $properties['label'] = array(
+    'label' => t("Label"),
+    'description' => t("The Islandora/Fedora object Title/Label."),
+    'setter callback' => 'entity_property_verbatim_set',
+    'schema field' => 'label',
+    'required' => TRUE,
+  );
+
+  $properties['state'] = array(
+    'label' => t("Status"),
+    'description' => t("The Islandora/Fedora object status (Active, Inactive, Deleted)."),
+    'setter callback' => 'entity_property_verbatim_set',
+    'schema field' => 'state',
+    'required' => TRUE,
+  );
+
+  return $info;
+}
+
 /**
  * Implements hook_islandora_object_ingested().
  */

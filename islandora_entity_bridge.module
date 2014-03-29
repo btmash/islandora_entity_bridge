@@ -20,7 +20,7 @@ function islandora_entity_bridge_entity_info() {
     'field cache' => FALSE,
     'entity cache' => FALSE,
     'load hook' => 'islandora_entity_bridge_load',
-    'fieldable' => FALSE,
+    'fieldable' => TRUE,
     'module' => 'islandora_entity_bridge',
     'access callback' => 'islandora_entity_bridge_access_callback',
     'entity keys' => array(
@@ -47,6 +47,12 @@ function islandora_entity_bridge_entity_info() {
   foreach (islandora_get_content_models(TRUE) as $content_model) {
     $entities['islandora_entity_bridge']['bundles'][$content_model['pid']] = array(
       'label' => $content_model['label'],
+      'admin' => array(
+        'path' => 'admin/structure/ieb_cmodel/manage/%islandora_entity_bridge_cmodel',
+        'real path' => 'admin/structure/ieb_cmodel/manage/' . $content_model['pid'],
+        'bundle argument' => 4,
+        'access arguments' => array('administer content types'),
+      ),
     );
   }
 
@@ -67,6 +73,20 @@ function islandora_entity_bridge_menu() {
     'access arguments' => array(FEDORA_VIEW_OBJECTS, 1),
   );
 
+  $items['admin/structure/ieb_cmodel'] = array(
+    'title' => 'Islandora Entity Bridge',
+    'description' => 'Manage fields and mostly display for the various CModels',
+    'page callback' => 'islandora_entity_bridge_overview_cmodels',
+    'access arguments' => array(FEDORA_ADD_DS),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'includes/islandora_entity_bridge.cmodel.inc',
+  );
+
+  $items['admin/structure/ieb_cmodel/list'] = array(
+    'title' => 'List',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -10,
+  );
   return $items;
 }
 
@@ -168,6 +188,25 @@ function islandora_entity_bridge_access_callback() {
 }
 
 /**
+ * Autoloader callback for entity cmodel.
+ */
+function islandora_entity_bridge_cmodel_load($islandora_entity_bridge_cmodel) {
+  module_load_include('inc', 'islandora', 'includes/utilities');
+
+  static $content_models;
+  if (!isset($content_models)) {
+    $content_models = islandora_get_content_models(TRUE);
+  }
+
+  foreach ($content_models as $content_model) {
+    if ($content_model['pid'] == $islandora_entity_bridge_cmodel) {
+      return $content_model['pid'];
+    }
+  }
+  return NULL;
+}
+
+/**
  * Autoloader callback for entity object.
  */
 function islandora_entity_bridge_load($islandora_entity_bridge_object_id, $reset = FALSE) {
@@ -200,6 +239,9 @@ function islandora_entity_bridge_delete_multiple(array $islandora_entity_bridge_
  * Label callback for islandora entity bridge objects, for menu router, etc.
  */
 function islandora_entity_bridge_label($islandora_entity_bridge_object, $type) {
+  if (!isset($islandora_entity_bridge_object->label)) {
+    return '';
+  }
   $label = $islandora_entity_bridge_object->label;
   $context = clone $islandora_entity_bridge_object;
   drupal_alter('islandora_entity_bridge_object_label', $label, $context);

@@ -42,7 +42,7 @@ function islandora_entity_bridge_entity_info() {
       ),
     ),
   );
-  foreach (_islandora_entity_bridge_get_content_models as $pid => $content_model) {
+  foreach (_islandora_entity_bridge_get_content_models() as $pid => $content_model) {
     $entities['islandora_entity_bridge']['bundles'][$pid] = array(
       'label' => $content_model['label'],
       'admin' => array(
@@ -326,52 +326,4 @@ function _islandora_entity_bridge_get_content_models($content_model = NULL) {
     return FALSE;
   }
   return $content_models;
-}
-
-/********** CLASSES **********/
-
-/**
- * Object Class for Islandora Entity Bridge.
- * Create any necessary overrides.
- */
-class IslandoraEntityBridge extends Entity {
-  /**
-   * Override defaultUri().
-   */
-  protected function defaultUri() {
-    return islandora_entity_bridge_uri($this);
-  }
-}
-
-/**
- * Controller class for Islandora Entity Bridge.
- *
- * This extends the DrupalDefaultEntityController class, adding required
- * special handling for islandora entity bridge objects.
- */
-class IslandoraEntityBridgeController extends EntityAPIController {
-
-  /**
-   * Overrides attachLoad().
-   */
-  protected function attachLoad(&$entities, $revision_id = FALSE) {
-    // Figure out any other hooks you want to attach.
-    parent::attachLoad($entities, $revision_id);
-    foreach ($entities as $entity) {
-      $entity->islandora_object = islandora_object_load($entity->pid);
-    }
-  }
-
-  /**
-   * Override the save method.
-   */
-  public function save($entity, DatabaseTransaction $transaction = NULL) {
-    $replacements = array(
-      '<',
-      '>',
-      'info:fedora/'
-    );
-    $entity->pid = str_replace($replacements, '', $entity->pid);
-    return parent::save($entity, $transaction);
-  }
 }

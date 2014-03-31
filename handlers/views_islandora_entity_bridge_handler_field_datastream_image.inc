@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Views field view field handler class.
+ * Views islandora entity bridge handler field datastream image handler class.
  */
 
 class views_islandora_entity_bridge_handler_field_datastream_image extends views_handler_field {

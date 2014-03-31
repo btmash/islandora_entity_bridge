@@ -1,6 +1,9 @@
 <?php
 
-/********** CORE HOOKS **********/
+/**
+ * @file
+ * Module file for the Islandora Entity Bridge module.
+ */
 
 /**
  * Implements hook_entity_info().
@@ -87,8 +90,6 @@ function islandora_entity_bridge_menu() {
 
   return $items;
 }
-
-/********** CONTRIB HOOKS **********/
 
 /*
  * Implements hook_entity_property_info().
@@ -218,8 +219,6 @@ function islandora_entity_bridge_views_api() {
   );
 }
 
-/********** ISLANDORA ENTITY BRIDGE OBJECT FUNCTIONS **********/
-
 /**
  * Check access permission for Islandora Entity Bridge Entity UI.
  */
@@ -302,8 +301,6 @@ function islandora_entity_bridge_view_entity($islandora_entity_bridge_object) {
   drupal_set_title($islandora_entity_bridge_object->label);
   return entity_view('islandora_entity_bridge', array($islandora_entity_bridge_object), 'full');
 }
-
-/********** PRIVATE FUNCTIONS **********/
 
 /**
  * Retrieves list of Content Models.

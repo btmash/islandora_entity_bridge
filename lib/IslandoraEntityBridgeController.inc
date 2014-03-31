@@ -1,11 +1,12 @@
 <?php
 
 /**
+ * @file
  * Controller class for Islandora Entity Bridge.
- *
  * This extends the DrupalDefaultEntityController class, adding required
- * special handling for islandora entity bridge objects.
+ * special handling for Islandora Entity Bridge Objects.
  */
+
 class IslandoraEntityBridgeController extends EntityAPIController {
 
   /**

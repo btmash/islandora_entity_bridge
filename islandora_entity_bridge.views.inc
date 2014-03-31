@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Views integration for the views_field_view module.
+ * Views integration for the Islandora Entity Bridge module.
  */
 
 /**

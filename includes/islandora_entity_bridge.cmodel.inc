@@ -1,6 +1,12 @@
 <?php
 
 /**
+ * @file
+ * Administrative file for the Islandora Entity Bridge Content Models.
+ */
+
+
+/**
  * Displays the content type admin overview page.
  */
 function islandora_entity_bridge_overview_cmodels() {

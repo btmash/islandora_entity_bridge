@@ -4,8 +4,6 @@
  * Displays the content type admin overview page.
  */
 function islandora_entity_bridge_overview_cmodels() {
-  module_load_include('inc', 'islandora', 'includes/utilities');
-
   $field_ui = module_exists('field_ui');
   $header = array(
     t('Name'),
@@ -16,12 +14,11 @@ function islandora_entity_bridge_overview_cmodels() {
   $header = array(t('Name'), array('data' => t('Operations'), 'colspan' => $field_ui ? '2' : '2'));
   $rows = array();
 
-  foreach (islandora_get_content_models(TRUE) as $content_model) {
-    $pid = $content_model['pid'];
+  foreach (_islandora_entity_bridge_get_content_models() as $pid => $content_model) {
     $row = array($content_model['label']);
     if ($field_ui) {
-      $row[] = array('data' => l(t('manage fields'), 'admin/structure/ieb_cmodel/manage/' . $content_model['pid'] . '/fields'));
-      $row[] = array('data' => l(t('manage display'), 'admin/structure/ieb_cmodel/manage/' . $content_model['pid'] . '/display'));
+      $row[] = array('data' => l(t('manage fields'), 'admin/structure/ieb_cmodel/manage/' . $pid . '/fields'));
+      $row[] = array('data' => l(t('manage display'), 'admin/structure/ieb_cmodel/manage/' . $pid . '/display'));
     }
     $rows[] = $row;
   }

@@ -6,8 +6,6 @@
  * Implements hook_entity_info().
  */
 function islandora_entity_bridge_entity_info() {
-  module_load_include('inc', 'islandora', 'includes/utilities');
-
   $entities = array();
   $entities['islandora_entity_bridge'] = array(
     'label' => t('Islandora Entity Bridge Object'),
@@ -44,12 +42,12 @@ function islandora_entity_bridge_entity_info() {
       ),
     ),
   );
-  foreach (islandora_get_content_models(TRUE) as $content_model) {
-    $entities['islandora_entity_bridge']['bundles'][$content_model['pid']] = array(
+  foreach (_islandora_entity_bridge_get_content_models as $pid => $content_model) {
+    $entities['islandora_entity_bridge']['bundles'][$pid] = array(
       'label' => $content_model['label'],
       'admin' => array(
         'path' => 'admin/structure/ieb_cmodel/manage/%islandora_entity_bridge_cmodel',
-        'real path' => 'admin/structure/ieb_cmodel/manage/' . $content_model['pid'],
+        'real path' => 'admin/structure/ieb_cmodel/manage/' . $pid,
         'bundle argument' => 4,
         'access arguments' => array('administer content types'),
       ),
@@ -241,17 +239,9 @@ function islandora_entity_bridge_access_callback() {
  * Autoloader callback for entity cmodel.
  */
 function islandora_entity_bridge_cmodel_load($islandora_entity_bridge_cmodel) {
-  module_load_include('inc', 'islandora', 'includes/utilities');
-
-  static $content_models;
-  if (!isset($content_models)) {
-    $content_models = islandora_get_content_models(TRUE);
-  }
-
-  foreach ($content_models as $content_model) {
-    if ($content_model['pid'] == $islandora_entity_bridge_cmodel) {
-      return $content_model['pid'];
-    }
+  $content_model = _islandora_entity_bridge_get_content_models($islandora_entity_bridge_cmodel);
+  if (!empty($content_model)) {
+    return $content_model['pid'];
   }
   return NULL;
 }
@@ -314,6 +304,29 @@ function islandora_entity_bridge_view_entity($islandora_entity_bridge_object) {
 }
 
 /********** PRIVATE FUNCTIONS **********/
+
+/**
+ * Retrieves list of Content Models.
+ */
+function _islandora_entity_bridge_get_content_models($content_model = NULL) {
+  module_load_include('inc', 'islandora', 'includes/utilities');
+
+  static $content_models;
+  if (!isset($content_models)) {
+    $content_models = array();
+    foreach (islandora_get_content_models(TRUE) as $cmodel) {
+      $content_models[$cmodel['pid']] = $cmodel;
+    }
+  }
+
+  if (!empty($content_model) && isset($content_models[$content_model])) {
+    return $content_models[$content_model];
+  }
+  elseif (isset($content_model)) {
+    return FALSE;
+  }
+  return $content_models;
+}
 
 /********** CLASSES **********/
 

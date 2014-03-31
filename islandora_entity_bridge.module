@@ -80,11 +80,11 @@ function islandora_entity_bridge_menu() {
     'file' => 'includes/islandora_entity_bridge.cmodel.inc',
   );
 
-  $items['admin/structure/ieb_cmodel/list'] = array(
+  $items['admin/structure/ieb_cmodel/manage'] = array(
     'title' => 'List',
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-    'weight' => -10,
+    'type' => MENU_CALLBACK,
   );
+
   return $items;
 }
 

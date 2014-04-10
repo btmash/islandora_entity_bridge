@@ -197,10 +197,14 @@ function islandora_entity_bridge_islandora_view_object(AbstractObject $object) {
 /**
  * Implements hook_islandora_object_purged().
  */
-function islandora_entity_bridge_islandora_object_purged(AbstractObject $object) {
+function islandora_entity_bridge_islandora_object_purged($object) {
+  $id = $object;
+  if (is_object($object)) {
+    $id = $object->id;
+  }
   $results = db_select('islandora_entity_bridge_mapping', 'iebm')
               ->fields('iebm', array('iebid'))
-              ->condition('iebm.pid', $object->id)
+              ->condition('iebm.pid', $id)
               ->execute();
   if ($results->rowCount() > 0) {
     foreach ($results as $result) {

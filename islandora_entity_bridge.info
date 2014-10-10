@@ -1,6 +1,7 @@
 name = Islandora Entity Bridge
 description = Bridge module to reference Islandora Entities/Fedora Objects
 core = 7.x
+package = Islandora Tools
 dependencies[] = islandora
 dependencies[] = entity
 files[] = lib/IslandoraEntityBridge.inc

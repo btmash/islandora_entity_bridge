@@ -71,14 +71,14 @@ function islandora_entity_bridge_menu() {
     'page callback' => 'islandora_entity_bridge_view_entity',
     'page arguments' => array(1),
     'access callback' => 'islandora_entity_bridge_access_menu_callback',
-    'access arguments' => array(FEDORA_VIEW_OBJECTS, 1),
+    'access arguments' => array(ISLANDORA_VIEW_OBJECTS, 1),
   );
 
   $items['admin/structure/ieb_cmodel'] = array(
     'title' => 'Islandora Entity Bridge',
     'description' => 'Manage fields and mostly display for the various CModels',
     'page callback' => 'islandora_entity_bridge_overview_cmodels',
-    'access arguments' => array(FEDORA_ADD_DS),
+    'access arguments' => array(ISLANDORA_ADD_DS),
     'type' => MENU_NORMAL_ITEM,
     'file' => 'includes/islandora_entity_bridge.cmodel.inc',
   );
@@ -235,7 +235,7 @@ function islandora_entity_bridge_access_menu_callback($op, $islandora_entity_bri
  * Access callback for Islandora Entity Bridge Objects.
  */
 function islandora_entity_bridge_access_callback() {
-  return user_access(FEDORA_VIEW_OBJECTS);
+  return user_access(ISLANDORA_VIEW_OBJECTS);
 }
 
 /**

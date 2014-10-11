@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @file
  * Views islandora entity bridge handler field datastream xml handler class.
@@ -9,9 +8,6 @@ class views_islandora_entity_bridge_handler_field_datastream_xml extends views_h
   function option_definition() {
     $options = parent::option_definition();
     $options['datastream'] = array('default' => 'DC');
-    $options['multiple'] = array('default' => FALSE);
-    $options['list_type'] = array('default' => 'ul');
-    $options['custom_separator'] = array('default' => ', ');
     return $options;
   }
 
@@ -39,17 +35,23 @@ class views_islandora_entity_bridge_handler_field_datastream_xml extends views_h
   }
   
   function render($values) {
-    $content = $this->options['datastream'];
+    $content = '';
     if (isset($this->view->entities[$this->view->row_index])) {
       $entity = $this->view->entities[$this->view->row_index];
-      // We should probably check the MIME type of the datastream somehow
-      // before we continue.
-      $xml = file_get_contents("{$GLOBALS['base_url']}/islandora/object/{$entity->pid}/datastream/{$this->options['datastream']}/VIEW");
-      $doc = new DOMDocument('1.0');
-      $doc->preserveWhiteSpace = FALSE;
-      $doc->formatOutput = TRUE;
-      $doc->loadXML($xml);
-      $content = htmlentities($doc->saveXML());
+      $datastream_id = $this->options['datastream'];
+      $datastream = islandora_datastream_load($datastream_id, $entity->pid);
+      // $datastream->content is not nicely formatted XML so here we format it
+      if ($datastream->mimetype === 'text/xml') {
+        $xml = $datastream->content;
+        $doc = new DOMDocument('1.0');
+        $doc->preserveWhiteSpace = FALSE;
+        $doc->formatOutput = TRUE;
+        $doc->loadXML($xml);
+        $content = htmlentities($doc->saveXML());
+      }
+      else {
+        $content = 'A text/xml datastream was not provided.';
+      }
     }
     return $content;
   }

@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Views islandora entity bridge handler field datastream handler class.
+ * Views islandora entity bridge handler field datastream link handler class.
  */
 
-class views_islandora_entity_bridge_handler_field_datastream extends views_handler_field {
+class views_islandora_entity_bridge_handler_field_datastream_link extends views_handler_field {
   function option_definition() {
     $options = parent::option_definition();
     $options['datastream'] = array('default' => 'DC');
@@ -18,8 +18,8 @@ class views_islandora_entity_bridge_handler_field_datastream extends views_handl
   function options_form(&$form, &$form_state) {
     parent::options_form($form, $form_state);
     $form['datastream'] = array(
-      '#title' => t('Datastream'),
-      '#description' => t('The datastream'),
+      '#title' => t('Datastream Link'),
+      '#description' => t('A link to the datastream'),
       '#type' => 'textfield',
       '#default_value' => $this->options['datastream'],
       '#required' => TRUE,

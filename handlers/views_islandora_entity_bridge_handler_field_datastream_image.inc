@@ -17,8 +17,8 @@ class views_islandora_entity_bridge_handler_field_datastream_image extends views
   function options_form(&$form, &$form_state) {
     parent::options_form($form, $form_state);
     $form['datastream'] = array(
-      '#title' => t('Datastream Image'),
-      '#description' => t('The datastream - Please ensure to select an image datastream'),
+      '#title' => t('Image Datastream'),
+      '#description' => t('An image datastream. Please be sure to select an image datastream.'),
       '#type' => 'textfield',
       '#default_value' => $this->options['datastream'],
       '#required' => TRUE,
@@ -68,6 +68,8 @@ class views_islandora_entity_bridge_handler_field_datastream_image extends views
         if (is_int($this->options['datastream_height']) && $this->options['datastream_height'] > 0) {
           $variables['height'] = $this->options['datastream_height'];
         }
+        // We should probably check the MIME type of the datastream somehow
+        // before we continue.
         $content = theme('image', $variables);
       }
     }

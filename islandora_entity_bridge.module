@@ -6,6 +6,26 @@
  */
 
 /**
+ * Implements hook_action_info().
+ */
+function islandora_entity_bridge_action_info() {
+  $actions = array();
+
+  $actions['islandora_entity_bridge_object_active_action'] = array(
+    'type' => 'islandora_entity_bridge',
+    'label' => t('Publish islandora entity bridge object'),
+    'configurable' => FALSE,
+  );
+  $actions['islandora_entity_bridge_object_inactive_action'] = array(
+    'type' => 'islandora_entity_bridge',
+    'label' => t('Publish islandora entity bridge object'),
+    'configurable' => FALSE,
+  );
+
+  return $actions;
+}
+
+/**
  * Implements hook_entity_info().
  */
 function islandora_entity_bridge_entity_info() {
@@ -304,6 +324,16 @@ function islandora_entity_bridge_uri($islandora_entity_bridge_object) {
 function islandora_entity_bridge_view_entity($islandora_entity_bridge_object) {
   drupal_set_title($islandora_entity_bridge_object->label);
   return entity_view('islandora_entity_bridge', array($islandora_entity_bridge_object), 'full');
+}
+
+function islandora_entity_bridge_object_active_action($islandora_entity_bridge_object, $context) {
+  $islandora_object = islandora_object_load($islandora_entity_bridge_object->pid);
+  $islandora_object->state = 'A';
+}
+
+function islandora_entity_bridge_object_inactive_action($islandora_entity_bridge_object, $context) {
+  $islandora_object = islandora_object_load($islandora_entity_bridge_object->pid);
+  $islandora_object->state = 'I';
 }
 
 /**

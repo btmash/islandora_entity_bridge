@@ -326,11 +326,17 @@ function islandora_entity_bridge_view_entity($islandora_entity_bridge_object) {
   return entity_view('islandora_entity_bridge', array($islandora_entity_bridge_object), 'full');
 }
 
+/**
+ * Publishes / sets Islandora Objects to 'Active'.
+ */
 function islandora_entity_bridge_object_active_action($islandora_entity_bridge_object, $context) {
   $islandora_object = islandora_object_load($islandora_entity_bridge_object->pid);
   $islandora_object->state = 'A';
 }
 
+/**
+ * Publishes / sets Islandora Objects to 'Inactive'.
+ */
 function islandora_entity_bridge_object_inactive_action($islandora_entity_bridge_object, $context) {
   $islandora_object = islandora_object_load($islandora_entity_bridge_object->pid);
   $islandora_object->state = 'I';

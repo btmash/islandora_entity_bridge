@@ -95,7 +95,7 @@ class views_islandora_entity_bridge_handler_field_datastream_xpath extends views
       $content = l($this->options['datastream'], "islandora/object/{$entity->pid}/datastream/{$this->options['datastream']}/VIEW");
       $options = $this->options;
       if (isset($entity->islandora_object[$this->options['datastream']])) {
-        $xml_object = $this->generate_simplexml_with_namespace($entity->islandora_object[$this->options['datastream']]->content);
+        $xml_object = $this->generate_simplexml_with_namespace($entity->islandora_object[$this->options['datastream']]->getContent());
         $results = $xml_object->xpath($this->options['datastream_xpath']);
         $contents = array();
         while (list( , $result) = each($results)) {

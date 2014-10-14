@@ -42,7 +42,7 @@ class views_islandora_entity_bridge_handler_field_datastream_xml extends views_h
       $datastream = islandora_datastream_load($datastream_id, $entity->pid);
       // $datastream->content is not nicely formatted XML so here we format it
       if ($datastream->mimetype === 'text/xml') {
-        $xml = $datastream->content;
+        $xml = $datastream->getContent();
         $doc = new DOMDocument('1.0');
         $doc->preserveWhiteSpace = FALSE;
         $doc->formatOutput = TRUE;

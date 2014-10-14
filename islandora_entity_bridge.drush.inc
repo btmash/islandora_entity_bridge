@@ -29,7 +29,7 @@ function drush_islandora_entity_bridge_populate_entity_bridge() {
     'error_message' => t('Content could not get reimported'),
   );
 
-  $connection = new IslandoraTuque();
+  $connection = islandora_get_tuque_connection();
   $query = 'SELECT ?object FROM <#ri> WHERE {
     ?object <dc:identifier> ?identifier ;
     } ORDER BY ?object';

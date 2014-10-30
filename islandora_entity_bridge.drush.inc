@@ -9,7 +9,7 @@ function islandora_entity_bridge_drush_command() {
   $items['islandora_entity_bridge_populate_entity_bridge'] = array(
     'aliases' => array('ieb-populate'),
     'description' => 'Populate entity bridge',
-    'bootstrap' => DRUSH_BOOSTRAP_DRUPAL_FULL,
+    'bootstrap' => DRUSH_BOOTSTRAP_DRUPAL_FULL,
   );
 
   return $items;

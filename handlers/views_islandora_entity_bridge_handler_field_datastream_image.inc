@@ -18,7 +18,7 @@ class views_islandora_entity_bridge_handler_field_datastream_image extends views
     parent::options_form($form, $form_state);
     $form['datastream'] = array(
       '#title' => t('Image Datastream'),
-      '#description' => t('An image datastream. Please be sure to select an image datastream.'),
+      '#description' => t('An image datastream. Allowed formats are: gif jpeg png.'),
       '#type' => 'textfield',
       '#default_value' => $this->options['datastream'],
       '#required' => TRUE,
@@ -52,25 +52,29 @@ class views_islandora_entity_bridge_handler_field_datastream_image extends views
   }
   
   function render($values) {
-    $content = $this->options['datastream'];
+    $content = '';
     if (isset($this->view->entities[$this->view->row_index])) {
       $entity = $this->view->entities[$this->view->row_index];
       $path = "islandora/object/{$entity->pid}/datastream/{$this->options['datastream']}/VIEW";
       $content = l($this->options['datastream'], $path);
       if (isset($entity->islandora_object[$this->options['datastream']])) {
-        $variables = array(
-          'path' => $path,
-          'title' => $entity->label,
-        );
-        if (is_int($this->options['datastream_width']) && $this->options['datastream_width'] > 0) {
-          $variables['width'] = $this->options['datastream_width'];
+        $datastream = islandora_datastream_load($this->options['datastream'], $entity->pid);
+        if (in_array($datastream->mimetype, array('image/gif', 'image/jpeg', 'image/png'))) {
+          $variables = array(
+            'path' => $path,
+            'title' => $entity->label,
+          );
+          if (is_numeric($this->options['datastream_width']) && $this->options['datastream_width'] > 0) {
+            $variables['width'] = $this->options['datastream_width'];
+          }
+          if (is_numeric($this->options['datastream_height']) && $this->options['datastream_height'] > 0) {
+            $variables['height'] = $this->options['datastream_height'];
+          }
+          $content = theme('image', $variables);
         }
-        if (is_int($this->options['datastream_height']) && $this->options['datastream_height'] > 0) {
-          $variables['height'] = $this->options['datastream_height'];
+        else {
+          $content = 'An image datastream was not provided.';
         }
-        // We should probably check the MIME type of the datastream somehow
-        // before we continue.
-        $content = theme('image', $variables);
       }
     }
     return $content;
